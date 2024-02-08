@@ -2,6 +2,7 @@ import 'package:authentication_with_firebase/views/screens/sign_up_screen.dart';
 import 'package:authentication_with_firebase/views/widgets/custom_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../global_toast/toast.dart';
@@ -72,7 +73,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     },
                     title: 'User Email',
                     isPasswordField: false,
-                    prifixicon: const Icon(Icons.password)),
+                    prifixicon: const Icon(Icons.email)),
                 const SizedBox(height: 16),
                 const Text(
                   'Enter your Password',
@@ -88,7 +89,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     },
                     title: 'User Password',
                     isPasswordField: true,
-                    prifixicon: const Icon(Icons.email),
+                    prifixicon: const Icon(Icons.password),
                     sufixicons: const Icon(Icons.remove_red_eye)),
                 const SizedBox(height: 26),
                 Center(
@@ -104,6 +105,13 @@ class _LogInScreenState extends State<LogInScreen> {
                             }
                           },
                         ),
+                ),
+                const SizedBox(height: 20),
+                CustomButton(
+                  title: 'Sign in with Google',
+                  onpress: () {
+                    _signInWithGoogle();
+                  },
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -156,7 +164,6 @@ class _LogInScreenState extends State<LogInScreen> {
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
-
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
@@ -165,7 +172,6 @@ class _LogInScreenState extends State<LogInScreen> {
           idToken: googleSignInAuthentication.idToken,
           accessToken: googleSignInAuthentication.accessToken,
         );
-
         await _firebaseAuth.signInWithCredential(credential);
         Get.to(const AuthSucessScreen());
       }

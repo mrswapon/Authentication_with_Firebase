@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final VoidCallback onpress;
   final String title;
-  final IconButton? prefixiIcon;
+  final Icon? prefixiIcon;
   const CustomButton({
     super.key,
     required this.title,
@@ -26,7 +26,7 @@ class CustomButton extends StatelessWidget {
         child: Text(
           title,
           style: const TextStyle(
-            letterSpacing: 3,
+            letterSpacing: 1,
             color: Colors.white,
             fontWeight: FontWeight.w800,
             fontSize: 20,

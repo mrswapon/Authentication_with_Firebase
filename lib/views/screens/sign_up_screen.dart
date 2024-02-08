@@ -15,9 +15,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuthServices _auth = FirebaseAuthServices();
-
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -100,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     prifixicon: const Icon(Icons.password_outlined),
                     sufixicons: const Icon(Icons.remove_red_eye)),
                 const SizedBox(height: 26),
-                CustomButton(title: 'SignUp', onpress: _signUp),
+                Center(child:isSigningUp ? CircularProgressIndicator(color: Colors.white,): CustomButton(title: 'SignUp', onpress: _signUp)),
               ],
             ),
           ),

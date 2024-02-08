@@ -1,13 +1,34 @@
 import 'package:authentication_with_firebase/views/screens/sign_up_screen.dart';
 import 'package:authentication_with_firebase/views/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../../global_toast/toast.dart';
+import '../../user_auth/firebase_auth_services.dart';
 import '../widgets/custom_button.dart';
 import 'auth_sucess_screen.dart';
 
-class LogInScreen extends StatelessWidget {
+class LogInScreen extends StatefulWidget {
   LogInScreen({super.key});
+
+  @override
+  State<LogInScreen> createState() => _LogInScreenState();
+}
+
+class _LogInScreenState extends State<LogInScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _isSigning = false;
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +64,7 @@ class LogInScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
+                    controller: _emailController,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Please enter your email";
@@ -58,6 +80,7 @@ class LogInScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
+                    controller: _passwordController,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Please enter your password";
@@ -68,13 +91,19 @@ class LogInScreen extends StatelessWidget {
                     prifixicon: const Icon(Icons.email),
                     sufixicons: const Icon(Icons.remove_red_eye)),
                 const SizedBox(height: 26),
-                CustomButton(
-                  title: 'LogIn',
-                  onpress: () {
-                    if (_formKey.currentState!.validate()) {
-                      Get.to(const AuthSucessScreen());
-                    }
-                  },
+                Center(
+                  child: _isSigning
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : CustomButton(
+                          title: 'LogIn',
+                          onpress: () {
+                            if (_formKey.currentState!.validate()) {
+                              Get.to(const AuthSucessScreen());
+                            }
+                          },
+                        ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -86,7 +115,7 @@ class LogInScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 16, color: Colors.cyan),
                       ),
                       onPressed: () {
-                        Get.to(SignUpScreen());
+                        Get.to(const SignUpScreen());
                       },
                     )
                   ],
@@ -97,5 +126,51 @@ class LogInScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _signIn() async {
+    setState(() {
+      _isSigning = true;
+    });
+
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigning = false;
+    });
+
+    if (user != null) {
+      showToast(message: "User is successfully signed in");
+      Get.to(const AuthSucessScreen());
+    } else {
+      showToast(message: "some error occurred");
+    }
+  }
+
+  _signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+          accessToken: googleSignInAuthentication.accessToken,
+        );
+
+        await _firebaseAuth.signInWithCredential(credential);
+        Get.to(const AuthSucessScreen());
+      }
+    } catch (e) {
+      showToast(message: "some error occurred $e");
+    }
   }
 }

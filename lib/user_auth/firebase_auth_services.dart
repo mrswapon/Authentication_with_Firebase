@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../global_toast/toast.dart';
 
 class FirebaseAuthServices {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<User?> signUpWithEmailPassword(String email, String password) async {
     try {
@@ -10,7 +10,7 @@ class FirebaseAuthServices {
           email: email, password: password);
       return credential.user;
     } catch (e) {
-      print('Some error occured');
+      print('Some error occurred');
     }
     return null;
   }
